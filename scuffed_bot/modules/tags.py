@@ -23,17 +23,27 @@ class Tags(commands.Cog):
             res = await session.execute(select(Tag).where(Tag.server_id == guild_id))
             return res.scalars().all()
 
-    async def create_tag(self, name, content, guild_id):
-        async with self.db() as session:
-            async with session.begin():
-                session.add(Tag(name=name, content=content, server_id=guild_id))
+    async def create_tag(self, name, content, guild_id) -> bool:
+        created = False
+        if not await self.get_tag(name, guild_id):
+            async with self.db() as session:
+                async with session.begin():
+                    session.add(Tag(name=name, content=content, server_id=guild_id))
+            created = True
+        return created
 
-    async def remove_tag(self, name, guild_id):
-        async with self.db() as session:
-            async with session.begin():
-                await session.execute(
-                    delete(Tag).where(Tag.name == name and Tag.server_id == guild_id)
-                )
+    async def remove_tag(self, name, guild_id) -> bool:
+        removed = False
+        if await self.get_tag(name, guild_id):
+            async with self.db() as session:
+                async with session.begin():
+                    await session.execute(
+                        delete(Tag).where(
+                            Tag.name == name and Tag.server_id == guild_id
+                        )
+                    )
+            removed = True
+        return removed
 
     # Tagging support
     @commands.command()
