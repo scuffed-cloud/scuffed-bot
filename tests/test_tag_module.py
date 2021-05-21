@@ -46,7 +46,7 @@ async def test_tag_creation():
     res = await tag_cog.create_tag("test_tag1", "scuffed-test", "myserver")
     assert not res
     async with db() as session:
-        res = await session.execute(select(Tag).where(Server.id == "myserver"))
+        res = await session.execute(select(Tag).where(Tag.server_id == "myserver"))
     tags = res.scalars().all()
     assert len(tags) == 1
     assert tags[0].name == "test_tag1"

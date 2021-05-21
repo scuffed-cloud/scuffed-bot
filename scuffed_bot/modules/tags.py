@@ -1,7 +1,7 @@
 import discord.ext.commands as commands
 import discord
 from sqlalchemy.future import select
-from sqlalchemy import delete
+from sqlalchemy import delete, join
 from scuffed_bot.database import Tag
 
 
@@ -62,7 +62,7 @@ class Tags(commands.Cog):
             if tag:
                 await ctx.send(tag.content)
             else:
-                await ctx.send(f"Tag {name} did not exist")
+                await ctx.send(f"Tag {name} does not exist")
 
     @tag.group(pass_context=True, invoke_without_command=True)
     async def add(self, ctx, member: discord.Member = None):
