@@ -24,6 +24,7 @@ class Tag(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     server_id = Column(String, ForeignKey("servers.id"))
     name = Column(String, nullable=False)
+    content = Column(String, nullable=False)
 
 
 async def load_database(session_string):

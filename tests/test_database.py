@@ -15,8 +15,8 @@ async def test_tag():
         async with session.begin():
             session.add_all(
                 [
-                    database.Tag(server_id="myserver", name="tag1"),
-                    database.Tag(server_id="myserver", name="tag2"),
+                    database.Tag(server_id="myserver", name="tag1", content="doot1"),
+                    database.Tag(server_id="myserver", name="tag2", content="doot2"),
                 ]
             )
         await session.commit()

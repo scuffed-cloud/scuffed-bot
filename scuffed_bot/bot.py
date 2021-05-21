@@ -1,13 +1,14 @@
-from discord import Bot
+from discord.ext.commands import Bot
 import scuffed_bot.database as database
 from scuffed_bot.modules.base import Base
 from scuffed_bot.modules.tags import Tags
 import logging
+import logging.handlers
 import importlib
 import asyncio
 import json
 
-COGS = ["Base", "Tags"]
+COGS = [Base, Tags]
 
 
 def configure_logging(file, level):
@@ -15,6 +16,7 @@ def configure_logging(file, level):
     logger.setLevel(getattr(logging, level.upper()))
     handler = logging.handlers.WatchedFileHandler(filename=file)
     logger.addHandler(handler)
+    return logger
 
 
 def load_config(path):
@@ -24,12 +26,11 @@ def load_config(path):
 
 
 async def load_bot(args):
-    bot = Bot()
+    bot = Bot(command_prefix="$")
     config = load_config(args.config)
-    configure_logging(config["log_file", "log_level"])
+    logger = configure_logging(config["log_file"], config["log_level"])
     db = await database.load_database(config["db_string"])
-    bot.command_prefix = "$"
     await bot.login(config["token"])
     for cog in COGS:
-        bot.add_cog(cog(bot, db, logging))
+        bot.add_cog(cog(bot, db, logger))
     await bot.connect()

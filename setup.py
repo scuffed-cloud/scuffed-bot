@@ -6,7 +6,7 @@ with open("requirements.txt", "r") as reqs:
     requirements = reqs.readlines()
 
 setup(
-    name="container-builder",
+    name="scuffed-bot",
     version="0.1.0",
     description="scuffed-cloud discord server bot",
     author="Philip Bove",
