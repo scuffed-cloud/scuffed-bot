@@ -1,0 +1,14 @@
+from scuffed_bot import bot
+import argparse
+
+def get_args():
+	parser = argparse.ArgumentParser(description='scuffed bot')
+	parser.add_argument('--config', description='path to bot config file', required=True)
+	return parser.parse_args()
+
+def main():
+	args = get_args()
+	bot.load_bot(args)
+
+if __name__ == '__main__':
+	main()
