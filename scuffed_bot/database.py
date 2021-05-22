@@ -27,6 +27,15 @@ class Tag(Base):
     content = Column(String, nullable=False)
 
 
+class Role(Base):
+    __tablename__ = "roles"
+    __mapper_args__ = {"eager_defaults": True}
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    server_id = Column(String, ForeignKey("servers.id"))
+    name = Column(String, nullable=False)
+    color = Column(Integer, nullable=True)
+
+
 async def load_database(session_string):
     eng = create_async_engine(session_string)
     async with eng.begin() as conn:

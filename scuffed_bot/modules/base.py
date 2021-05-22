@@ -21,5 +21,10 @@ class Base(commands.Cog):
                     self.logger.info(f"Guild {guild.id}:{guild.name} on-boarded")
 
     @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        self.logger.error(f"Error reported: {error}")
+        await self.ctx.send("Uh oh, some error occured and was logged")
+
+    @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         await self.create_guild(guild)
