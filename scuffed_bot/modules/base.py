@@ -22,9 +22,16 @@ class Base(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        self.logger.error(f"Error reported: {error}")
-        await self.ctx.send("Uh oh, some error occured and was logged")
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send(f"Sorry, you lack the permissions to do that")
+        else:
+            self.logger.error(f"Error reported: {error}")
+            await ctx.send("Uh oh, some uknown error occured and was logged")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         await self.create_guild(guild)
+
+    @commands.command()
+    async def ping(self, ctx, member: discord.Member = None):
+        await ctx.send('Pong!')

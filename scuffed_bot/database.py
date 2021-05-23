@@ -30,10 +30,21 @@ class Tag(Base):
 class Role(Base):
     __tablename__ = "roles"
     __mapper_args__ = {"eager_defaults": True}
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=False)
     server_id = Column(String, ForeignKey("servers.id"))
     name = Column(String, nullable=False)
     color = Column(Integer, nullable=True)
+
+
+class Incident(Base):
+    __tablename__ = "incidents"
+    __mapper_args__ = {"eager_defaults": True}
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    server_id = Column(String, ForeignKey("servers.id"))
+    user_id = Column(String, nullable=False)
+    reason = Column(String)
+    type = Column(String, nullable=False)
+    create_date = Column(DateTime, server_default=func.now())
 
 
 async def load_database(session_string):

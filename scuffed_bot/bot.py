@@ -2,13 +2,15 @@ from discord.ext.commands import Bot
 import scuffed_bot.database as database
 from scuffed_bot.modules.base import Base
 from scuffed_bot.modules.tags import Tags
+from scuffed_bot.modules.roles import Roles
+from scuffed_bot.modules.moderation import Moderation
 import logging
 import logging.handlers
 import importlib
 import asyncio
 import json
 
-COGS = [Base, Tags]
+COGS = [Base, Tags, Roles, Moderation]
 
 
 def configure_logging(file, level):

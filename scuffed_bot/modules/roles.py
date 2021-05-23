@@ -23,12 +23,12 @@ class Roles(commands.Cog):
             res = await session.execute(select(Role).where(Role.server_id == guild_id))
             return res.scalars().all()
 
-    async def create_role(self, name, color, guild_id):
+    async def create_role(self, name, color, guild_id, role_id):
         created = False
         if not await self.get_role(name, guild_id):
             async with self.db() as session:
                 async with session.begin():
-                    session.add(Role(name=name, color=color, server_id=guild_id))
+                    session.add(Role(name=name, color=color, server_id=guild_id, id=role_id))
             created = True
 
         return created
@@ -47,12 +47,12 @@ class Roles(commands.Cog):
         return removed
 
     @commands.command()
-    async def roles(self, ctx, member: discord.Member = None):
+    async def roles(self, ctx):
         roles = ""
-        role_list = await self.get_roles(self, ctx.guild.id)
+        role_list = await self.get_roles(ctx.guild.id)
         roles += f"This server has {len(role_list)} roles\n"
         for role in role_list:
-            roles += f"{role}\n"
+            roles += f"{role.name}\n"
         await ctx.send(roles)
 
     @commands.group(pass_context=True, invoke_without_command=True)
@@ -60,27 +60,34 @@ class Roles(commands.Cog):
         pass
 
     @role.group(pass_context=True, invoke_without_command=True)
-    async def add(self, ctx, member: discord.Member = None):
-        _, _, role = ctx.message.content.split(" ")
-        if len(role) == 2:
-            name = role[0]
-            color = role[1]
-        elif len(role) == 2:
-            name = role[0]
+    @commands.has_permissions(manage_roles=True)
+    async def add(self, ctx):
+        cmd = ctx.message.content.split(" ")
+        if len(cmd) == 4:
+            name = cmd[2]
+            color = cmd[3]
+        elif len(cmd) == 3:
+            name = cmd[2]
             color = None
         else:
             await ctx.send("Command needs to at least contain a role name")
             return
-        res = await self.create_role(name, color, ctx.guild.id)
+        role = await ctx.guild.create_role(name=name, colour=int(color))
+        res = await self.create_role(name, color, ctx.guild.id, role.id)
         if res:
             await ctx.send(f"{name} created")
         else:
             await ctx.send(f"{name} already exists")
 
     @role.group(pass_context=True, invoke_without_command=True)
-    async def remove(self, ctx, member: discord.Member = None):
-        _, role = ctx.message.content.split(" ")
-        if await self.remove_role(role, ctx.guild.id):
-            ctx.send(f"{role} removed")
+    @commands.has_permissions(manage_roles=True)
+    async def remove(self, ctx):
+        _,_, name = ctx.message.content.split(" ")  
+        role = await self.get_role(name, ctx.guild.id)
+        if role:
+            g_role = ctx.guild.get_role(role.id)
+            await self.remove_role(name, ctx.guild.id)
+            await g_role.delete()
+            await ctx.send(f"{role.name} removed")
         else:
-            ctx.send(f"{role} does not exist")
+            await ctx.send(f"{name} does not exist")
