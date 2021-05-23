@@ -34,4 +34,4 @@ class Base(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx, member: discord.Member = None):
-        await ctx.send('Pong!')
+        await ctx.send("Pong!")

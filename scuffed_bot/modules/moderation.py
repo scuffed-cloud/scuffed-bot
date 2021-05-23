@@ -22,7 +22,11 @@ class Moderation(commands.Cog):
 
     async def get_incidents(self, user_id, guild_id):
         async with self.db() as session:
-            res = await session.execute(select(Incident).where(Incident.user_id == user_id and Incident.server_id == guild_id).order_by(Incident.create_date.desc()))
+            res = await session.execute(
+                select(Incident)
+                .where(Incident.user_id == user_id and Incident.server_id == guild_id)
+                .order_by(Incident.create_date.desc())
+            )
             return res.scalars().all()
 
     @commands.command()
@@ -47,7 +51,6 @@ class Moderation(commands.Cog):
                 return
         await ctx.send(f"Ban for {user_id} not found")
 
-
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member = None):
@@ -63,8 +66,7 @@ class Moderation(commands.Cog):
     async def record(self, ctx, member: discord.Member = None):
         user = ctx.message.mentions[0]
         incidents = await self.get_incidents(user.id, ctx.guild.id)
-        sheet = f'<@{user.id}> has {len(incidents)} in the record\n'
+        sheet = f"<@{user.id}> has {len(incidents)} in the record\n"
         for item in incidents:
-            sheet += f'{item.create_date} reason: {item.reason} type: {item.type}\n'
+            sheet += f"{item.create_date} reason: {item.reason} type: {item.type}\n"
         await ctx.send(sheet)
-

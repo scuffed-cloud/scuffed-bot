@@ -23,8 +23,8 @@ async def test_get_role():
         async with session.begin():
             session.add_all(
                 [
-                    Role(name="test_role1", color=1, server_id="myserver"),
-                    Role(name="test_role2", color=1, server_id="myserver"),
+                    Role(name="test_role1", color=1, server_id="myserver", id=1),
+                    Role(name="test_role2", color=1, server_id="myserver", id=2),
                 ]
             )
 
@@ -41,9 +41,9 @@ async def test_role_creation():
     db = await database.load_database(session_string)
     await create_server(db, "myserver")
     role_cog = Roles(None, db, logging)
-    res = await role_cog.create_role("test_role1", 3, "myserver")
+    res = await role_cog.create_role("test_role1", 3, "myserver", 1)
     assert res
-    res = await role_cog.create_role("test_role1", 1, "myserver")
+    res = await role_cog.create_role("test_role1", 1, "myserver", 2)
     assert not res
     async with db() as session:
         res = await session.execute(select(Role).where(Role.server_id == "myserver"))
@@ -58,8 +58,8 @@ async def test_role_removal():
     db = await database.load_database(session_string)
     await create_server(db, "myserver")
     role_cog = Roles(None, db, logging)
-    await role_cog.create_role("test_role1", 1, "myserver")
-    await role_cog.create_role("test_role2", 2, "myserver")
+    await role_cog.create_role("test_role1", 1, "myserver", 1)
+    await role_cog.create_role("test_role2", 2, "myserver", 2)
     res = await role_cog.remove_role("test_role1", "myserver")
     assert res
     res = await role_cog.remove_role("test_role1", "myserver")

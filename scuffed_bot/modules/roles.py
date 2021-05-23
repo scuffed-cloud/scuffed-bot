@@ -28,7 +28,9 @@ class Roles(commands.Cog):
         if not await self.get_role(name, guild_id):
             async with self.db() as session:
                 async with session.begin():
-                    session.add(Role(name=name, color=color, server_id=guild_id, id=role_id))
+                    session.add(
+                        Role(name=name, color=color, server_id=guild_id, id=role_id)
+                    )
             created = True
 
         return created
@@ -82,7 +84,7 @@ class Roles(commands.Cog):
     @role.group(pass_context=True, invoke_without_command=True)
     @commands.has_permissions(manage_roles=True)
     async def remove(self, ctx):
-        _,_, name = ctx.message.content.split(" ")  
+        _, _, name = ctx.message.content.split(" ")
         role = await self.get_role(name, ctx.guild.id)
         if role:
             g_role = ctx.guild.get_role(role.id)
