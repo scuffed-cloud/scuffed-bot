@@ -58,7 +58,7 @@ class Roles(commands.Cog):
         await ctx.send(roles)
 
     @commands.group(pass_context=True, invoke_without_command=True)
-    async def role(self, ctx, member: discord.Member = None):
+    async def role(self, ctx):
         pass
 
     @role.group(pass_context=True, invoke_without_command=True)
@@ -67,14 +67,17 @@ class Roles(commands.Cog):
         cmd = ctx.message.content.split(" ")
         if len(cmd) == 4:
             name = cmd[2]
-            color = cmd[3]
+            color = int(cmd[3])
         elif len(cmd) == 3:
             name = cmd[2]
             color = None
         else:
             await ctx.send("Command needs to at least contain a role name")
             return
-        role = await ctx.guild.create_role(name=name, colour=int(color))
+        if color:
+            role = await ctx.guild.create_role(name=name, colour=color)
+        else:
+            role = await ctx.guild.create_role(name=name)
         res = await self.create_role(name, color, ctx.guild.id, role.id)
         if res:
             await ctx.send(f"{name} created")
@@ -93,3 +96,25 @@ class Roles(commands.Cog):
             await ctx.send(f"{role.name} removed")
         else:
             await ctx.send(f"{name} does not exist")
+
+    @role.group(pass_context=True, invoke_without_command=True)
+    async def join(self, ctx):
+        _, _, name = ctx.message.content.split(" ")
+        role = await self.get_role(name, ctx.guild.id)
+        if role:
+            g_role = ctx.guild.get_role(role.id)
+            await ctx.message.author.add_roles(g_role)
+            await ctx.send(f"<@{ctx.message.author.id}> added to {name} role")
+        else:
+            await ctx.send(f"{name} does not exist!")
+
+    @role.group(pass_context=True, invoke_without_command=True)
+    async def leave(self, ctx):
+        _, _, name = ctx.message.content.split(" ")
+        role = await self.get_role(name, ctx.guild.id)
+        if role:
+            g_role = ctx.guild.get_role(role.id)
+            await ctx.message.author.remove_roles(g_role)
+            await ctx.send(f"<@{ctx.message.author.id}> removed from {name} role")
+        else:
+            await ctx.send(f"{name} does not exist!")

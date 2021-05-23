@@ -31,7 +31,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def ban(self, ctx, member: discord.Member):
+    async def ban(self, ctx):
         _, reason = ctx.message.content.split("reason:")
         if not len(reason) > 0:
             reason = None
@@ -53,7 +53,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member = None):
+    async def kick(self, ctx):
         _, reason = ctx.message.content.split("reason:")
         if not len(reason) > 0:
             reason = None
@@ -63,7 +63,7 @@ class Moderation(commands.Cog):
         await ctx.send(f"Kicked {user.name}:{user.id}")
 
     @commands.command()
-    async def record(self, ctx, member: discord.Member = None):
+    async def record(self, ctx):
         user = ctx.message.mentions[0]
         incidents = await self.get_incidents(user.id, ctx.guild.id)
         sheet = f"<@{user.id}> has {len(incidents)} in the record\n"

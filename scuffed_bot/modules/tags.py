@@ -23,7 +23,7 @@ class Tags(commands.Cog):
             res = await session.execute(select(Tag).where(Tag.server_id == guild_id))
             return res.scalars().all()
 
-    async def create_tag(self, name, content, guild_id) -> bool:
+    async def create_tag(self, name, content, guild_id):
         created = False
         if not await self.get_tag(name, guild_id):
             async with self.db() as session:
@@ -32,7 +32,7 @@ class Tags(commands.Cog):
             created = True
         return created
 
-    async def remove_tag(self, name, guild_id) -> bool:
+    async def remove_tag(self, name, guild_id):
         removed = False
         if await self.get_tag(name, guild_id):
             async with self.db() as session:
@@ -47,7 +47,7 @@ class Tags(commands.Cog):
 
     # Tagging support
     @commands.command()
-    async def tags(self, ctx, member: discord.Member = None):
+    async def tags(self, ctx):
         tags = await self.get_tags(ctx.guild.id)
         tag_list = f"This server has {len(tags)} tags\n"
         for tag in tags:
@@ -55,7 +55,7 @@ class Tags(commands.Cog):
         await ctx.send(tag_list)
 
     @commands.group(pass_context=True, invoke_without_command=True)
-    async def tag(self, ctx, member: discord.Member = None):
+    async def tag(self, ctx):
         if not ctx.invoked_subcommand:
             command, name = ctx.message.content.split(" ")
             tag = await self.get_tag(name, ctx.guild.id)
@@ -65,7 +65,7 @@ class Tags(commands.Cog):
                 await ctx.send(f"Tag {name} does not exist")
 
     @tag.group(pass_context=True, invoke_without_command=True)
-    async def add(self, ctx, member: discord.Member = None):
+    async def add(self, ctx):
         _, _, name, content = ctx.message.content.split(" ")
         if not await self.get_tag(name, ctx.guild.id):
             await self.create_tag(name, content, ctx.guild.id)
@@ -74,7 +74,7 @@ class Tags(commands.Cog):
             await ctx.send(f"Tag {name} already exists!")
 
     @tag.group(pass_context=True, invoke_without_command=True)
-    async def remove(self, ctx, member: discord.Member = None):
+    async def remove(self, ctx):
         _, _, name = ctx.message.content.split(" ")
         await self.remove_tag(name, ctx.guild.id)
         await ctx.send(f"Tag {name} was removed!")

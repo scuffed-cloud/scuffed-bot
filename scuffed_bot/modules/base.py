@@ -2,6 +2,7 @@ import discord.ext.commands as commands
 import discord
 from sqlalchemy.future import select
 from scuffed_bot.database import Server, Tag
+import traceback
 
 
 class Base(commands.Cog):
@@ -33,5 +34,5 @@ class Base(commands.Cog):
         await self.create_guild(guild)
 
     @commands.command()
-    async def ping(self, ctx, member: discord.Member = None):
+    async def ping(self, ctx):
         await ctx.send("Pong!")
