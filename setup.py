@@ -7,7 +7,7 @@ with open("requirements.txt", "r") as reqs:
 
 setup(
     name="scuffed-bot",
-    version="0.1.0-alpha",
+    version="0.1.1-alpha",
     description="scuffed-cloud discord server bot",
     author="Philip Bove",
     install_requires=requirements,

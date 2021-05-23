@@ -51,7 +51,7 @@ class Tags(commands.Cog):
         tags = await self.get_tags(ctx.guild.id)
         tag_list = f"This server has {len(tags)} tags\n"
         for tag in tags:
-            tag_list += "{tag}\n"
+            tag_list += f"{tag.name}\n"
         await ctx.send(tag_list)
 
     @commands.group(pass_context=True, invoke_without_command=True)
