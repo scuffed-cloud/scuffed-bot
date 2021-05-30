@@ -32,8 +32,8 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def ban(self, ctx):
-        _, reason = ctx.message.content.split("reason:")
-        if not len(reason) > 0:
+        msg_args = await util.parse_args(ctx.message.content, [])
+        if 'reason' not in msg_args.keys():
             reason = None
         user = ctx.message.mentions[0]
         await ctx.guild.ban(user, reason=reason)
@@ -43,19 +43,19 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx):
-        _, user_id = ctx.message.content.split(" ")
+        msg_args = await util.parse_args(ctx.message.content, ['user_id'])
         for ban in await ctx.guild.bans():
-            if ban.user.id == int(user_id):
+            if ban.user.id == int(msg_args['user_id']):
                 await ctx.guild.unban(ban.user)
                 await ctx.send(f"Unbanned {ban.user.name}:{ban.user.id}")
                 return
-        await ctx.send(f"Ban for {user_id} not found")
+        await ctx.send(f"Ban for {msg_args['user_id']} not found")
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx):
-        _, reason = ctx.message.content.split("reason:")
-        if not len(reason) > 0:
+        msg_args = await util.parse_args(ctx.message.content, [])
+        if 'reason' not in msg_args.keys():
             reason = None
         user = ctx.message.mentions[0]
         await ctx.guild.kick(user)

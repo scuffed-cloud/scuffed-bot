@@ -57,24 +57,24 @@ class Tags(commands.Cog):
     @commands.group(pass_context=True, invoke_without_command=True)
     async def tag(self, ctx):
         if not ctx.invoked_subcommand:
-            command, name = ctx.message.content.split(" ")
-            tag = await self.get_tag(name, ctx.guild.id)
+            msg_args = await util.parse_args(ctx.message.content, ['name'])
+            tag = await self.get_tag(msg_args['name'], ctx.guild.id)
             if tag:
                 await ctx.send(tag.content)
             else:
-                await ctx.send(f"Tag {name} does not exist")
+                await ctx.send(f"Tag {msg_args['name']} does not exist")
 
     @tag.group(pass_context=True, invoke_without_command=True)
     async def add(self, ctx):
-        _, _, name, content = ctx.message.content.split(" ")
-        if not await self.get_tag(name, ctx.guild.id):
-            await self.create_tag(name, content, ctx.guild.id)
-            await ctx.send(f"Tag {name} created!")
+        msg_args = await util.parse_args(ctx.message.content, ['name', 'content'])
+        if not await self.get_tag(msg_args['name'], ctx.guild.id):
+            await self.create_tag(msg_args['name'], msg_args['content'], ctx.guild.id)
+            await ctx.send(f"Tag {msg_args['name']} created!")
         else:
-            await ctx.send(f"Tag {name} already exists!")
+            await ctx.send(f"Tag {msg_args['name']} already exists!")
 
     @tag.group(pass_context=True, invoke_without_command=True)
     async def remove(self, ctx):
-        _, _, name = ctx.message.content.split(" ")
-        await self.remove_tag(name, ctx.guild.id)
-        await ctx.send(f"Tag {name} was removed!")
+        msg_args = await util.parse_args(ctx.message.content, ['name'])
+        await self.remove_tag(msg_args['name'], ctx.guild.id)
+        await ctx.send(f"Tag {msg_args['name']} was removed!")

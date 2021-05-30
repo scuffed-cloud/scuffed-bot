@@ -1,5 +1,6 @@
 import discord.ext.commands as commands
 import discord
+import scuffed_bot.util as util
 from sqlalchemy.future import select
 from sqlalchemy import delete, join
 from scuffed_bot.database import Role
@@ -64,57 +65,49 @@ class Roles(commands.Cog):
     @role.group(pass_context=True, invoke_without_command=True)
     @commands.has_permissions(manage_roles=True)
     async def add(self, ctx):
-        cmd = ctx.message.content.split(" ")
-        if len(cmd) == 4:
-            name = cmd[2]
-            color = int(cmd[3])
-        elif len(cmd) == 3:
-            name = cmd[2]
-            color = None
+        msg_args = await util.parse_args(ctx.message.content, ['name'])
+        if 'color' in msg_args.keys():
+            role = await ctx.guild.create_role(name=msg_args['name'], colour=msg_args['color'])
+            res = await self.create_role(msg_args['name'], msg_args['color'], ctx.guild.id, role.id)
         else:
-            await ctx.send("Command needs to at least contain a role name")
-            return
-        if color:
-            role = await ctx.guild.create_role(name=name, colour=color)
-        else:
-            role = await ctx.guild.create_role(name=name)
-        res = await self.create_role(name, color, ctx.guild.id, role.id)
+            role = await ctx.guild.create_role(name=msg_args['name'])
+            res = await self.create_role(msg_args['name'], None, ctx.guild.id, role.id)
         if res:
-            await ctx.send(f"{name} created")
+            await ctx.send(f"{msg_args['name']} created")
         else:
-            await ctx.send(f"{name} already exists")
+            await ctx.send(f"{msg_args['name']} already exists")
 
     @role.group(pass_context=True, invoke_without_command=True)
     @commands.has_permissions(manage_roles=True)
     async def remove(self, ctx):
-        _, _, name = ctx.message.content.split(" ")
-        role = await self.get_role(name, ctx.guild.id)
+        msg_args = await util.parse_args(ctx.message.content, ['name'])
+        role = await self.get_role(msg_args['name'], ctx.guild.id)
         if role:
             g_role = ctx.guild.get_role(role.id)
-            await self.remove_role(name, ctx.guild.id)
+            await self.remove_role(msg_args['name'], ctx.guild.id)
             await g_role.delete()
             await ctx.send(f"{role.name} removed")
         else:
-            await ctx.send(f"{name} does not exist")
+            await ctx.send(f"{msg_args['name']} does not exist")
 
     @role.group(pass_context=True, invoke_without_command=True)
     async def join(self, ctx):
-        _, _, name = ctx.message.content.split(" ")
-        role = await self.get_role(name, ctx.guild.id)
+        msg_args = await util.parse_args(ctx.message.content, ['name'])
+        role = await self.get_role(msg_args['name'], ctx.guild.id)
         if role:
             g_role = ctx.guild.get_role(role.id)
             await ctx.message.author.add_roles(g_role)
-            await ctx.send(f"<@{ctx.message.author.id}> added to {name} role")
+            await ctx.send(f"<@{ctx.message.author.id}> added to {msg_args['name']} role")
         else:
-            await ctx.send(f"{name} does not exist!")
+            await ctx.send(f"{msg_args['name']} does not exist!")
 
     @role.group(pass_context=True, invoke_without_command=True)
     async def leave(self, ctx):
-        _, _, name = ctx.message.content.split(" ")
-        role = await self.get_role(name, ctx.guild.id)
+        msg_args = await util.parse_args(ctx.message.content, ['name'])
+        role = await self.get_role(msg_args['name'], ctx.guild.id)
         if role:
             g_role = ctx.guild.get_role(role.id)
             await ctx.message.author.remove_roles(g_role)
-            await ctx.send(f"<@{ctx.message.author.id}> removed from {name} role")
+            await ctx.send(f"<@{ctx.message.author.id}> removed from {msg_args['name']} role")
         else:
-            await ctx.send(f"{name} does not exist!")
+            await ctx.send(f"{msg_args['name']} does not exist!")

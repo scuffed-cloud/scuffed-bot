@@ -1,6 +1,7 @@
 import discord.ext.commands as commands
 import discord
 from sqlalchemy.future import select
+from scuffed_bot.exceptions import ArgParseError
 from scuffed_bot.database import Server, Tag
 
 
@@ -24,6 +25,8 @@ class Base(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(f"Sorry, you lack the permissions to do that")
+        elif isinstance(error, ArgParseError):
+            await ctx.send(str(error))
         # this ignores messages that are like "$500 is what I paid"
         elif isinstance(error, commands.errors.CommandNotFound):
             pass
