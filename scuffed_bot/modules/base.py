@@ -25,6 +25,9 @@ class Base(commands.Cog):
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(f"Sorry, you lack the permissions to do that")
+        # this ignores messages that are like "$500 is what I paid"
+        elif isinstance(error, commands.errors.CommandNotFound):
+            pass
         else:
             self.logger.error(f"Error reported: {error}")
             await ctx.send("Uh oh, some uknown error occured and was logged")
