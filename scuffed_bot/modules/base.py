@@ -2,7 +2,6 @@ import discord.ext.commands as commands
 import discord
 from sqlalchemy.future import select
 from scuffed_bot.database import Server, Tag
-import traceback
 
 
 class Base(commands.Cog):
